@@ -38,8 +38,8 @@ def init(link):
     return browser
 
 
-def login():
-    b = init(URL)
+def login(url):
+    b = init(url)
     time.sleep(2)
     b.maximize_window()
     username = b.find_element(by=By.ID, value="Username")
@@ -51,24 +51,23 @@ def login():
     action2 = ActionChains(b)
     action2.send_keys(PASSWORD, Keys.TAB, Keys.TAB, Keys.ENTER).perform()
     time.sleep(10)
-    shot_types(b)
-    play_types(b)
-    cumulative_box(b)
-    overall(b)
-    zip_files()
+    return b
 
 
-def get_headers(b, team, single_line):
+def get_headers(b):
+    team = []
+    single_line = []
     headers = b.find_elements(by=By.TAG_NAME, value="th")
     for h in headers:
         single_line.append(h.text)
     team.append(single_line)
+    return team, single_line
 
 
-def retrieve_data(columns, b):
+def retrieve_data(num_columns, b):
     single_line = []
     team = []
-    get_headers(b, team, single_line)
+    team, single_line = get_headers(b)
     stats = b.find_elements(by=By.TAG_NAME, value="td")
     count = 0
     for stat in stats:
@@ -76,7 +75,7 @@ def retrieve_data(columns, b):
         res = stat.text
         res = res.replace(',', '')
         single_line.append(res)
-        if count == columns:
+        if count == num_columns:
             try:
                 team.append(single_line)
             except:
@@ -349,4 +348,10 @@ def zip_files():
     zipObj.close()
 
 
-login()
+if __name__ == "__main__":
+    b = login(URL)
+    shot_types(b)
+    play_types(b)
+    cumulative_box(b)
+    overall(b)
+    zip_files()
